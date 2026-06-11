@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AMPLA Operação</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+  </head>
+  <body>
+    <section class="login-screen" id="loginScreen">
+      <div class="login-panel">
+        <div class="brand login-brand">
+          <div class="brand-mark" aria-hidden="true">
+            <span>A</span>
+          </div>
+          <div>
+            <strong>AMPLA</strong>
+            <small>Sistema operacional</small>
+          </div>
+        </div>
+        <h1>Entrar na operação</h1>
+        <p>Acesso liberado conforme o e-mail da equipe. O sistema ajusta permissões e painéis automaticamente.</p>
+        <div id="googleButton" class="google-box"></div>
+        <div class="login-fallback" id="loginFallback"></div>
+        <small id="loginHelp">Entre pelo link de convite enviado pelo gestor.</small>
+      </div>
+    </section>
+
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <span>A</span>
+          </div>
+          <div>
+            <strong>AMPLA</strong>
+            <small>Controle operacional</small>
+          </div>
+        </div>
+
+        <div class="profile-card user-card">
+          <span id="userName">Usuário</span>
+          <strong id="userEmail">email</strong>
+          <button type="button" class="ghost-btn" id="logoutBtn">Sair</button>
+        </div>
+
+        <nav class="nav-list" aria-label="Navegação">
+          <button class="nav-item is-active" data-view="fila">Fila principal</button>
+          <button class="nav-item" data-view="arquivo">Histórico/Arquivo</button>
+        </nav>
+
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Fila operacional única</p>
+            <h1 id="viewTitle">Fila principal</h1>
+          </div>
+          <div class="top-actions">
+            <button class="ghost-btn" id="archiveDoneBtn" type="button">Arquivar concluídas</button>
+            <button class="ghost-btn" id="exportBtn" type="button">Exportar</button>
+            <button class="primary-btn" id="newDemandBtn" type="button">Nova demanda</button>
+          </div>
+        </header>
+
+        <section class="notice-strip" id="noticeStrip" aria-live="polite"></section>
+
+        <section class="scoreboard" aria-label="Resumo">
+          <article>
+            <span>Abertas</span>
+            <strong id="openCount">0</strong>
+          </article>
+          <article>
+            <span>Atrasadas</span>
+            <strong id="lateCount">0</strong>
+          </article>
+          <article>
+            <span>Prazo próximo</span>
+            <strong id="soonCount">0</strong>
+          </article>
+          <article>
+            <span>Validação gestor</span>
+            <strong id="validationCount">0</strong>
+          </article>
+          <article>
+            <span>Críticas</span>
+            <strong id="criticalCount">0</strong>
+          </article>
+        </section>
+
+        <section class="charts-grid" id="chartsGrid" aria-label="Gráficos do gestor">
+          <article class="chart-card">
+            <div class="chart-head">
+              <h2>Demandas abertas</h2>
+              <span>Por prioridade</span>
+            </div>
+            <div id="openChart" class="bar-chart"></div>
+          </article>
+          <article class="chart-card">
+            <div class="chart-head">
+              <h2>Demandas fechadas</h2>
+              <span>Últimos arquivos</span>
+            </div>
+            <div id="closedChart" class="bar-chart"></div>
+          </article>
+          <article class="chart-card wide-chart">
+            <div class="chart-head">
+              <h2>Performance do backoffice</h2>
+              <span>Abertas, fechadas e atrasadas por funcionário</span>
+            </div>
+            <div id="performanceChart" class="performance-chart"></div>
+          </article>
+        </section>
+
+        <section class="invite-panel" id="invitePanel" aria-label="Convites de acesso">
+          <div class="invite-head">
+            <div>
+              <h2>Convites de acesso</h2>
+              <span>Somente gestor pode gerar links de entrada.</span>
+            </div>
+            <button class="ghost-btn" id="copyAllInvitesBtn" type="button">Copiar todos</button>
+          </div>
+          <div class="invite-grid">
+            <article class="invite-card">
+              <strong>Convite gestor</strong>
+              <span>Para novo gestor de carteira.</span>
+              <div class="invite-link" id="inviteGestor"></div>
+              <button class="mini-btn" type="button" data-copy-invite="gestor">Copiar link</button>
+            </article>
+            <article class="invite-card">
+              <strong>Convite backoffice</strong>
+              <span>Para execução operacional.</span>
+              <div class="invite-link" id="inviteBackoffice"></div>
+              <button class="mini-btn" type="button" data-copy-invite="backoffice">Copiar link</button>
+            </article>
+            <article class="invite-card">
+              <strong>Convite diretoria</strong>
+              <span>Para controle e exportação.</span>
+              <div class="invite-link" id="inviteDiretoria"></div>
+              <button class="mini-btn" type="button" data-copy-invite="diretoria">Copiar link</button>
+            </article>
+          </div>
+        </section>
+
+        <section class="control-panel">
+          <div class="search-field">
+            <label for="searchInput">Buscar</label>
+            <input id="searchInput" type="search" placeholder="Demanda, condomínio, responsável...">
+          </div>
+          <div>
+            <label for="managerFilter">Gestor</label>
+            <select id="managerFilter"></select>
+          </div>
+          <div>
+            <label for="personFilter">Quem vai fazer</label>
+            <select id="personFilter"></select>
+          </div>
+          <div>
+            <label for="priorityFilter">Prioridade</label>
+            <select id="priorityFilter">
+              <option value="">Todas</option>
+              <option>Crítica</option>
+              <option>Alta</option>
+              <option>Média</option>
+              <option>Baixa</option>
+            </select>
+          </div>
+          <div>
+            <label for="statusFilter">Situação</label>
+            <select id="statusFilter">
+              <option value="">Todas</option>
+              <option>Nova</option>
+              <option>Em execução</option>
+              <option>Aguardando</option>
+              <option>Validação gestor</option>
+              <option>Concluída</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="table-card">
+          <div class="table-head">
+            <div>
+              <strong id="tableTitle">Demandas da carteira</strong>
+              <span id="tableSubtitle">Tudo que precisa de responsável, prazo e acompanhamento.</span>
+            </div>
+            <div class="line-count" id="lineCount">0 linhas</div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Demanda</th>
+                  <th>Condomínio</th>
+                  <th>Tipo</th>
+                  <th>Prioridade</th>
+                  <th>Gestor</th>
+                  <th>Quem vai fazer</th>
+                  <th>Situação</th>
+                  <th>Prazo</th>
+                  <th>Validação</th>
+                  <th>Última atualização</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="demandRows"></tbody>
+            </table>
+          </div>
+          <div class="empty-state" id="emptyState">
+            <strong>Nenhuma demanda nesta tela.</strong>
+            <span>A fila fica limpa quando cada item tem dono, prazo e situação.</span>
+          </div>
+        </section>
+
+        <section class="insights-grid">
+          <article class="insight-card">
+            <h2>Alertas simples</h2>
+            <div id="alertsList"></div>
+          </article>
+          <article class="insight-card">
+            <h2>Gargalos</h2>
+            <div id="bottlenecksList"></div>
+          </article>
+          <article class="insight-card rules-card">
+            <h2>Regras da operação</h2>
+            <span>Tudo entra no sistema.</span>
+            <span>WhatsApp não substitui a fila.</span>
+            <span>Backoffice executa. Gestor controla.</span>
+            <span>Conclusão precisa de validação.</span>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="demandDialog">
+      <form method="dialog" id="demandForm">
+        <div class="modal-head">
+          <div>
+            <p class="eyebrow">Demanda</p>
+            <h2 id="modalTitle">Nova demanda</h2>
+          </div>
+          <button class="icon-btn" value="cancel" type="submit" aria-label="Fechar">×</button>
+        </div>
+
+        <input type="hidden" id="demandId">
+        <div class="form-grid">
+          <label>Demanda
+            <input id="demandName" required maxlength="80">
+          </label>
+          <label>Condomínio
+            <input id="condoName" required maxlength="80">
+          </label>
+          <label>Tipo
+            <select id="demandType" required>
+              <option>Financeiro</option>
+              <option>Jurídico</option>
+              <option>Manutenção</option>
+              <option>Atendimento</option>
+              <option>Documentos</option>
+              <option>Assembleia</option>
+              <option>Outros</option>
+            </select>
+          </label>
+          <label>Prioridade
+            <select id="priority" required>
+              <option>Crítica</option>
+              <option>Alta</option>
+              <option>Média</option>
+              <option>Baixa</option>
+            </select>
+          </label>
+          <label>Gestor responsável
+            <input id="manager" required list="managerNames">
+          </label>
+          <label>Quem vai fazer
+            <input id="executor" required list="executorNames">
+          </label>
+          <label>Situação
+            <select id="status" required>
+              <option>Nova</option>
+              <option>Em execução</option>
+              <option>Aguardando</option>
+              <option>Validação gestor</option>
+              <option>Concluída</option>
+            </select>
+          </label>
+          <label>Prazo
+            <input id="dueDate" type="date" required>
+          </label>
+          <label>Prazo da execução
+            <input id="executionDate" type="date" required>
+          </label>
+          <label>Prazo de validação
+            <input id="validationDate" type="date" required>
+          </label>
+          <label>Validação do gestor
+            <select id="validation" required>
+              <option>Pendente</option>
+              <option>Aprovada</option>
+              <option>Corrigir</option>
+            </select>
+          </label>
+          <label>Última atualização
+            <input id="lastUpdate" readonly>
+          </label>
+          <label class="wide">O que precisa fazer
+            <textarea id="description" required rows="4"></textarea>
+          </label>
+        </div>
+
+        <div class="priority-help">
+          <strong>Prioridade é impacto, não pressão.</strong>
+          <span>Crítica: risco financeiro, jurídico, multa ou vencimento imediato.</span>
+          <span>Alta: demanda sensível ou impacto importante.</span>
+          <span>Média: rotina operacional normal.</span>
+          <span>Baixa: ajuste simples ou melhoria sem urgência.</span>
+        </div>
+
+        <div class="modal-actions">
+          <button class="danger-btn" id="deleteBtn" type="button">Excluir</button>
+          <span id="lockHint"></span>
+          <button class="ghost-btn" value="cancel" type="submit">Cancelar</button>
+          <button class="primary-btn" id="saveBtn" type="submit" value="default">Salvar</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="exportDialog">
+      <form method="dialog">
+        <div class="modal-head">
+          <div>
+            <p class="eyebrow">Arquivamento</p>
+            <h2>Exportar planilhas</h2>
+          </div>
+          <button class="icon-btn" value="cancel" type="submit" aria-label="Fechar">×</button>
+        </div>
+        <div class="export-grid">
+          <button type="button" class="export-card" data-export="openCsv">
+            <strong>Fila principal CSV</strong>
+            <span>Para Excel ou Google Sheets.</span>
+          </button>
+          <button type="button" class="export-card" data-export="archiveCsv">
+            <strong>Histórico CSV</strong>
+            <span>Concluídas e validadas.</span>
+          </button>
+          <button type="button" class="export-card" data-export="backupJson">
+            <strong>Backup completo JSON</strong>
+            <span>Melhor para restaurar depois.</span>
+          </button>
+          <label class="export-card import-card">
+            <strong>Importar backup JSON</strong>
+            <span>Restaura um arquivo salvo.</span>
+            <input id="importInput" type="file" accept="application/json">
+          </label>
+        </div>
+      </form>
+    </dialog>
+
+    <datalist id="managerNames"></datalist>
+    <datalist id="executorNames"></datalist>
+
+    <script src="app.js"></script>
+  </body>
+</html>
