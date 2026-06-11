@@ -19,13 +19,25 @@ Para banco central, historico compartilhado e backups no servidor, usar Render, 
 Adicionar a URL publica do GitHub Pages no Google Cloud:
 
 ```text
-https://USUARIO.github.io/ampla-operacao
+https://USUARIO.github.io
 ```
 
 Local:
 
 ```text
 Google Cloud Console > APIs e servicos > Credenciais > OAuth Client > Authorized JavaScript origins
+```
+
+Para este deploy, a origem ja configurada foi:
+
+```text
+https://laguna101.github.io
+```
+
+A URL completa do site fica com o caminho do repositorio:
+
+```text
+https://laguna101.github.io/ampla-operacao/
 ```
 
 ## Entrada
